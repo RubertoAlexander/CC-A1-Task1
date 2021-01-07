@@ -54,20 +54,41 @@
       <div class="row">
         {% if greeting.author %}
           <b>{{ greeting.author.email }}
+
+            {% if greeting.country != '' %}
+             | {{ greeting.country }}
+            {% endif %}
+
             {% if user and user.user_id() == greeting.author.identity %}
               (You)
             {% endif %}
           </b> wrote:
+
         {% else %}
-          An anonymous person wrote:
+        <!-- Anonymous greeting -->
+          An anonymous person 
+          {% if greeting.country != '' %}
+             from {{ greeting.country }}
+          {% endif %}
+          wrote:
         {% endif %}
         <blockquote>{{ greeting.content }}</blockquote>
+
       </div>
       {% endfor %}
       <!-- [END greetings] -->
 
-      <form action="/sign?guestbook_name={{ guestbook_name }}" method="post">
+      <form id='guestbook-form' action="/sign?guestbook_name={{ guestbook_name }}" method="post">
         <div><textarea name="content" class="input-block-level" rows="3"></textarea></div>
+
+        <label for='country'>Country:</label></span>
+        <select id='country' name='country' form='guestbook-form'>
+            <option value='' disabled selected> Select country</option>
+            {% for country in countries %}
+            <option value={{country}}>{{ country }}</option>
+            {% endfor %}
+        </select>
+        
         <div><input type="submit" class="btn btn-large btn-primary" value="Sign Guestbook"></div>
       </form>
 
