@@ -57,6 +57,7 @@ class Greeting(ndb.Model):
     """A main model for representing an individual Guestbook entry."""
     author = ndb.StructuredProperty(Author)
     content = ndb.StringProperty(indexed=False)
+    country = ndb.StringProperty(indexed=False)
     date = ndb.DateTimeProperty(auto_now_add=True)
 # [END greeting]
 
@@ -80,6 +81,7 @@ class MainPage(webapp2.RequestHandler):
             url_linktext = 'Login'
 
         template_values = {
+            'countries': self.getCountryList(),
             'user': user,
             'greetings': greetings,
             'guestbook_name': urllib.quote_plus(guestbook_name),
@@ -89,6 +91,13 @@ class MainPage(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
+    
+    def getCountryList(self):
+        with open('countries.txt') as f:
+            countries = f.readlines()
+        countries = [line.strip() for line in countries]
+
+        return countries
 # [END main_page]
 
 
@@ -111,6 +120,7 @@ class Guestbook(webapp2.RequestHandler):
                     email=users.get_current_user().email())
 
         greeting.content = self.request.get('content')
+        greeting.country=self.request.get('country')
         greeting.put()
 
         query_params = {'guestbook_name': guestbook_name}
